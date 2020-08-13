@@ -2,7 +2,7 @@ import React from 'react';
 import Graph from './Graph';
 import CurrentPrice from './CurrentPrice';
 
-const styles = { height: '77vh', paddingLeft: 0 };
+const styles = { height: '70vh', paddingLeft: 0 };
 
 function Content() {
   return (

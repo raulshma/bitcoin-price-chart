@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import useInterval from '../hooks/useInterval';
 import moment from 'moment';
 
 function CurrentPrice() {
   const [price, setPrice] = useState('');
+  const [rateDiff, setRateDiff] = useState();
   const [lastUpdated, setLastUpdated] = useState(moment().format('h:mm a'));
 
   async function getCurrentPrice() {
-    const localData = localStorage.current && JSON.parse(localStorage.current);
-    if (
-      localData &&
-      new Date(new Date().toISOString()).getTime() -
-        new Date(localData.time.updatedISO).getTime() <
-        60000
-    ) {
-      const {
-        INR: { rate: price },
-      } = localData.bpi;
-      setPrice(price);
-      return;
-    }
     setLastUpdated(moment().format('h:mm a'));
     console.log(
       `%c Fetching New Current Price %c ${lastUpdated}`,
@@ -28,21 +17,37 @@ function CurrentPrice() {
     const response = await fetch(
       'https://api.coindesk.com/v1/bpi/currentprice/INR.json'
     );
-    const data = await response.json();
-    localStorage.current = JSON.stringify(data);
     const {
-      INR: { rate: price },
-    } = data.bpi;
+      bpi: {
+        INR: { rate: price, rate_float },
+      },
+    } = await response.json();
+    if (!rateDiff) {
+      setRateDiff({
+        initial: false,
+        display: false,
+        oldPrice: rate_float,
+        diff: rate_float,
+      });
+    } else {
+      const calcDiff =
+        rateDiff.oldPrice >= rate_float
+          ? -(rateDiff.oldPrice - rate_float)
+          : +(rate_float - rateDiff.oldPrice);
+      setRateDiff({
+        initial: false,
+        display: true,
+        oldPrice: rate_float,
+        diff: calcDiff.toFixed(2),
+      });
+    }
     setPrice(price);
   }
+  useInterval(() => {
+    getCurrentPrice();
+  }, 61000);
   useEffect(() => {
     getCurrentPrice();
-    const id = setTimeout(() => {
-      getCurrentPrice();
-    }, 61000);
-    return () => {
-      clearInterval(id);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -50,7 +55,14 @@ function CurrentPrice() {
       <h1 className="font-size-20 font-weight-bold mb-0">
         1 &#8383; = &#8377; {price}
       </h1>
-      <small style={{ marginTop: '3px' }}>Last updated at {lastUpdated}</small>
+      <small style={{ marginTop: '3px' }}>
+        <span title="Updates every minute">Last updated at {lastUpdated}</span>
+        {rateDiff && rateDiff.display === true ? (
+          <span className="ml-10 font-weight-bold">
+            Change : &#8377; {rateDiff.diff}
+          </span>
+        ) : null}
+      </small>
     </div>
   );
 }
