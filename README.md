@@ -1,4 +1,5 @@
 # BITCOIN PRICE CHART
+![Build and Deploy](https://github.com/raulshma/bitcoin-price-chart/workflows/Build%20and%20Deploy/badge.svg)
 
 ## Available Scripts
 
