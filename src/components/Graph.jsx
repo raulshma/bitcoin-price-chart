@@ -19,8 +19,10 @@ import {
 function Graph() {
   const [data, setData] = useState([]);
   const [lineGraph, setLineGraph] = useState(true);
+  const [timeRange, setTimeRange] = useState('days');
 
   async function getPrices(num = 7, type = 'days', refresh = false) {
+
     const localData = localStorage.data && JSON.parse(localStorage.data);
     if (
       refresh === false &&
@@ -30,6 +32,7 @@ function Graph() {
         86400000 + 360000
     ) {
       returnData(localData);
+      setTimeRange(localData.timeRangeType);
       return;
     }
     console.log(
@@ -43,7 +46,8 @@ function Graph() {
       `https://api.coindesk.com/v1/bpi/historical/INR.json?start=${oldDate}&end=${nowDate}`
     );
     const apidata = await response.json();
-    localStorage.data = JSON.stringify(apidata);
+    localStorage.data = JSON.stringify({ ...apidata, timeRangeType: type });
+    setTimeRange(type);
     returnData(apidata);
   }
 
@@ -70,6 +74,7 @@ function Graph() {
               name="radio-length"
               id="switch-graph-years"
               value="years"
+              checked={timeRange === 'years'}
               onChange={() => getPrices(1, 'years', true)}
             />
             <label htmlFor="switch-graph-years">1 Year</label>
@@ -80,6 +85,7 @@ function Graph() {
               name="radio-length"
               id="switch-graph-month"
               value="months"
+              checked={timeRange === 'months'}
               onChange={() => getPrices(1, 'months', true)}
             />
             <label htmlFor="switch-graph-month">1 Month</label>
@@ -90,6 +96,7 @@ function Graph() {
               name="radio-length"
               id="switch-graph-week"
               value="days"
+              checked={timeRange === 'days'}
               onChange={() => getPrices(8, 'days', true)}
             />
             <label htmlFor="switch-graph-week">Week</label>
