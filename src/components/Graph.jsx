@@ -22,7 +22,6 @@ function Graph() {
   const [timeRange, setTimeRange] = useState('days');
 
   async function getPrices(num = 7, type = 'days', refresh = false) {
-
     const localData = localStorage.data && JSON.parse(localStorage.data);
     if (
       refresh === false &&
@@ -39,9 +38,13 @@ function Graph() {
       '%c Fetching New Graph Prices',
       'color: orange; font-weight: bold;'
     );
+    console.log(type);
 
     const nowDate = moment().format('yyyy-MM-DD');
-    const oldDate = moment(nowDate).subtract(num, type).format('yyyy-MM-DD');
+    const oldDate =
+      type === 'all'
+        ? moment('2010-07-17T18:30:00.000Z').format('yyyy-MM-DD')
+        : moment(nowDate).subtract(num, type).format('yyyy-MM-DD');
     const response = await fetch(
       `https://api.coindesk.com/v1/bpi/historical/INR.json?start=${oldDate}&end=${nowDate}`
     );
@@ -68,6 +71,17 @@ function Graph() {
     <>
       <div className="d-flex justify-content-between mb-10">
         <div className="d-flex">
+          <div className="custom-radio mr-5 scaleDown">
+            <input
+              type="radio"
+              name="radio-length"
+              id="switch-graph-all"
+              value="all"
+              checked={timeRange === 'all'}
+              onChange={() => getPrices(1, 'all', true)}
+            />
+            <label htmlFor="switch-graph-all">All</label>
+          </div>
           <div className="custom-radio mr-5 scaleDown">
             <input
               type="radio"
@@ -123,7 +137,7 @@ function Graph() {
             <Line
               type="monotone"
               dataKey="price"
-              name="Price"
+              name="Price ($)"
               stroke="#8884d8"
               activeDot={{ r: 6 }}
             />
