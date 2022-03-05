@@ -4,22 +4,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "currency-symbol-map": "^4.0.4",
-    "halfmoon": "^1.0.3",
-    "moment": "^2.27.0",
-    "node-sass": "^4.14.1",
-    "react": "^16.13.1",
-    "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3",
-    "recharts": "^1.8.5"
+    "currency-symbol-map": "^5.0.1",
+    "halfmoon": "^1.1.1",
+    "moment": "^2.29.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "recharts": "^2.1.9"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.13",
+    "@vitejs/plugin-react": "^1.2.0",
+    "sass": "^1.49.9",
+    "vite": "^2.3.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+    "start": "vite --port 6969",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
   },
   "browserslist": {
     "production": [
